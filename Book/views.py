@@ -21,6 +21,8 @@ import asyncio
 import json
 from django.core import serializers
 
+import time#导入的包最好放在文件头
+
 async def index(request):
     return await sync_to_async(HttpResponse)("Hello, async Django!")
 
@@ -43,7 +45,6 @@ async def orm_test(request):
     return JsonResponse(results,safe=False)
     
 
-import time
 
 class BooksViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly,IsOwnerOrReadOnly]
