@@ -21,7 +21,7 @@ import asyncio
 import json
 from django.core import serializers
 
-import time#导入的包最好放在文件头
+import time#更改一下注释git推送的看看效果
 
 async def index(request):
     return await sync_to_async(HttpResponse)("Hello, async Django!")
