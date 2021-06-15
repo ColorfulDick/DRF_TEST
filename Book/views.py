@@ -139,26 +139,26 @@ class BookDetaialView(View):
     def http_method_not_allowed(self, request, *args, **kwargs):
         return HttpResponse('你使用的是%s请求，但是不支持POST以外的其他请求！'%request.method)
 
+class AsyncGet:
+    async def get(id):
+        try:
+            results=cache.get(str(id))
+            if results==None:
+                query=await sync_to_async(Books.objects.filter)(id=id)
+                results=await sync_to_async(serializers.serialize)('json',query)
+                cache.set(str(id), results, nx=True,timeout=3600)
+            return results
+        except Books.DoesNotExist:
+            raise Http404
 
-async def get(id):
-    try:
-        results=cache.get(str(id))
-        if results==None:
-            query=await sync_to_async(Books.objects.filter)(id=id)
-            results=await sync_to_async(serializers.serialize)('json',query)
-            cache.set(str(id), results, nx=True,timeout=3600)
-        return results
-    except Books.DoesNotExist:
-        raise Http404
+    async def post(id):
+        return HttpResponse('上传图书id是：{}'.format(id))
 
-async def post(id):
-    return HttpResponse('上传图书id是：{}'.format(id))
-
-async def deal(request, id, format=None):
-    if request.method == 'GET':
-        serializer=await get(id)
-    elif request.method == 'POST':
-        serializer=await post(id)
-    else:
-        return HttpResponse('你使用的是%s请求，但是不支持GET/POST以外的其他请求！'%request.method)
-    return JsonResponse(serializer,safe=False)
+    async def deal(request, id, format=None):
+        if request.method == 'GET':
+            serializer=await AsyncGet.get(id)
+        elif request.method == 'POST':
+            serializer=await AsyncGet.post(id)
+        else:
+            return HttpResponse('你使用的是%s请求，但是不支持GET/POST以外的其他请求！'%request.method)
+        return JsonResponse(serializer,safe=False)
