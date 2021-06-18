@@ -3,7 +3,7 @@ FROM ubuntu:20.04
 #更新软件源，必须要执行，否则可能会出错。-y就是要跳过提示直接安装。
 RUN apt-get -y update
 
-RUN apt-get install -y python3.7 
+RUN apt-get install -y python3.8 
 RUN apt-get install -y python3-pip
 RUN apt-get install -y python-setuptools
 #MySQL-Python必须得先安装这个库
