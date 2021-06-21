@@ -1,0 +1,56 @@
+version: "3"
+
+services:
+
+
+  db:
+    image: mysql
+    environment:
+       MYSQL_DATABASE: app_blog
+       MYSQL_ROOT_PASSWORD: admin
+    volumes:
+      - /srv/db:/var/lib/mysql
+    restart: always
+    networks:
+      zhongtong_net:
+          ipv4_address: 172.19.0.2
+          # 保留 172.19.0.1 作为 zhongtong_net 的网关ip
+
+  redis:
+    image: redis
+    restart: always
+    networks:
+      zhongtong_net:
+          ipv4_address: 172.19.0.3
+
+  memcached:
+    image: memcached
+    restart: always
+    networks:
+      zhongtong_net:
+          ipv4_address: 172.19.0.4
+
+  web:
+    build: ./Mydrf
+    ports:
+    - "8000:8000"
+    volumes:
+    - ./Mydrf:/Mydrf
+    - /tmp/logs:/tmp
+    command: bash start.sh
+    links:
+    - redis
+    - memcached
+    restart: always
+    tty: true
+    networks:
+      zhongtong_net:
+          ipv4_address: 172.19.0.5
+
+networks:
+  zhongtong_net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.19.0.0/16
+        # 子网
